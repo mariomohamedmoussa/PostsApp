@@ -1,10 +1,15 @@
 package com.stc.postsapp.view.main
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.paging.PagingDataAdapter
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.DiffUtil.ItemCallback
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
@@ -14,87 +19,72 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.stc.domain.entity.Category
 import com.stc.postsapp.R
-import kotlinx.android.synthetic.main.item_category.view.*
+import com.stc.postsapp.databinding.ItemCategoryBinding
+import javax.inject.Inject
 
 
-class CategoryAdapter  (var context: Context) : RecyclerView.Adapter<CategoryAdapter.ViewHolder>() {
-    var List: MutableList<Category> = mutableListOf()
-    var layoutInflater: LayoutInflater? = null
-    private var clickListener: ItemClickListener? = null
-
-    init {
-        this.List = mutableListOf()
-        layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-    }
+class CategoryAdapter @Inject constructor():PagingDataAdapter<Category,CategoryAdapter.ViewHolder>(dif) {
+    lateinit var binding:ItemCategoryBinding
+    lateinit var context:Context
 
     override fun onCreateViewHolder(parent: ViewGroup, p1: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_category, parent, false)
-        return ViewHolder(view)
-    }
-
-    override fun getItemCount(): Int {
-        return List.size
+        val inflater = LayoutInflater.from(parent.context)
+        binding =ItemCategoryBinding.inflate(inflater, parent, false)
+        context = parent.context
+        return ViewHolder()
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        List[position].let { holder.bindItems(it) }
-
-
-    }
-
-    fun add(data: List<Category>) {
-        List.clear()
-        List.addAll(data)
-        notifyDataSetChanged()
+        holder.bindItems(getItem(position)!!)
+        holder.setIsRecyclable(false)
 
     }
 
-    fun setOnItemClickListener(itemClickListener: ItemClickListener) {
-        this.clickListener = itemClickListener
-    }
-
-    interface ItemClickListener {
-        fun onClick()
-    }
-
-    override fun getItemViewType(position: Int): Int {
-        return position
-    }
-
-
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-
+   inner class ViewHolder : RecyclerView.ViewHolder(binding.root) {
+        @SuppressLint("SetTextI18n")
         fun bindItems(element: Category) {
-            itemView.tv_activity_register_mobile.text = element.strCategory
-//                   add listener to set progress visible or hidden
-            Glide.with(itemView.context)
-                .load(element.strCategoryThumb)
-                .diskCacheStrategy(DiskCacheStrategy.DATA)
-                .override(Target.SIZE_ORIGINAL)
-                .listener(object : RequestListener<Drawable?> {
-                    override fun onLoadFailed(
-                        e: GlideException?,
-                        model: Any,
-                        target: Target<Drawable?>,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        itemView.pb_item_category_progress_bar.visibility = View.GONE
-                        return false
-                    }
+            binding.apply {
+                tvActivityRegisterMobile.text = element.title
+                Glide.with(itemView.context)
+                    .load(element.posterPath)
+                    .diskCacheStrategy(DiskCacheStrategy.DATA)
+                    .override(Target.SIZE_ORIGINAL)
+                    .listener(object : RequestListener<Drawable?> {
+                        override fun onLoadFailed(
+                            e: GlideException?,
+                            model: Any,
+                            target: Target<Drawable?>,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            pbItemCategoryProgressBar.visibility = View.GONE
+                            return false
+                        }
 
-                    override fun onResourceReady(
-                        resource: Drawable?,
-                        model: Any,
-                        target: Target<Drawable?>,
-                        dataSource: DataSource,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        itemView.pb_item_category_progress_bar.visibility = View.GONE
-                        return false
-                    }
-                })
-                .into(itemView.iv_item_category_image)
+                        override fun onResourceReady(
+                            resource: Drawable?,
+                            model: Any,
+                            target: Target<Drawable?>,
+                            dataSource: DataSource,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            pbItemCategoryProgressBar.visibility = View.GONE
+                            return false
+                        }
+                    })
+                    .into(ivItemCategoryImage)
+            }
+        }
+    }
 
+    companion object{
+        val dif = object :DiffUtil.ItemCallback<Category>(){
+            override fun areItemsTheSame(oldItem: Category, newItem: Category): Boolean {
+                return oldItem .id== newItem.id
+            }
+
+            override fun areContentsTheSame(oldItem: Category, newItem: Category): Boolean {
+                return oldItem== newItem
+            }
 
         }
     }

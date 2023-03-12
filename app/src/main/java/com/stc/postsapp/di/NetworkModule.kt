@@ -1,6 +1,7 @@
 package com.stc.postsapp.di
 
 import com.stc.data.remote.ApiService
+import com.stc.domain.utils.ConstantDomain.BASE_URL
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -14,7 +15,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
-    private const val BASE_URL = "https://www.themealdb.com/api/json/v1/1/"
 
     @Provides
     @Singleton

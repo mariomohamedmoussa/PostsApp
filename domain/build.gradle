@@ -39,5 +39,15 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 
-    
+    // Google Gson serialize dependency
+    implementation 'com.google.code.gson:gson:2.8.5'
+
+    // Room
+    implementation 'androidx.room:room-runtime:2.5.0'
+    annotationProcessor 'androidx.room:room-compiler:2.5.0'
+    annotationProcessor 'androidx.room:room-compiler:2.5.0'
+
+    // Rx dependency
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.9'
 }
